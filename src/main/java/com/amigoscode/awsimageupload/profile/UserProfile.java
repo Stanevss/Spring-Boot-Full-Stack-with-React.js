@@ -9,10 +9,10 @@ public class UserProfile {
     private String username;
     private String userProfileImageLink; // S3 key
 
-    public UserProfile(UUID userProfile,
+    public UserProfile(UUID userProfileId,
                        String username,
                        String userProfileImageLink) {
-        userProfile = userProfile;
+        this.userProfileId = userProfileId;
         this.username = username;
         this.userProfileImageLink = userProfileImageLink;
     }
