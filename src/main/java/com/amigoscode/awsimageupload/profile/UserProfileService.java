@@ -33,8 +33,10 @@ public class UserProfileService {
             throw new IllegalStateException("Cannot upload empty file [" + file.getSize() + "]");
         }
         // 2. If file is an image
-        if (!Arrays.asList(ContentType.IMAGE_JPEG, ContentType.IMAGE_PNG, ContentType.IMAGE_GIF).contains(file.getContentType())) {
-            throw new IllegalStateException("File must be an image");
+        if (!Arrays.asList(ContentType.IMAGE_JPEG.getMimeType(),
+                ContentType.IMAGE_PNG.getMimeType(),
+                ContentType.IMAGE_GIF.getMimeType()).contains(file.getContentType())) {
+            throw new IllegalStateException("File must be an image [" + file.getContentType() + "]");
         }
         // 3. The user exists in our database
         UserProfile user = userProfileDataAccessService
@@ -49,9 +51,10 @@ public class UserProfileService {
         metadata.put("Content-Length", String.valueOf(file.getSize()));
         // 5. Store the image in s3 and update database (userProfileImageLink) with s3 image link
         String path = String.format("%s/%s", BucketName.PROFILE_IMAGE.getBucketName(), user.getUserProfileId());
-        String filename = String.format("%s-%s", file.getName(), UUID.randomUUID());
+        String filename = String.format("%s-%s", file.getOriginalFilename(), UUID.randomUUID());
         try {
             fileStore.save(path, filename, Optional.of(metadata), file.getInputStream());
+            user.setUserProfileImageLink(filename);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
